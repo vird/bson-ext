@@ -75,6 +75,27 @@ describe('BSON', function() {
   /**
    * @ignore
    */
+  it('Should hot segfault when a given javascript object has more than 16MB', function(
+    done
+  ) {
+    var expectedSize = 20*1024*1024;
+    // Create a simple object
+    var doc = { large: Buffer.alloc(expectedSize) };
+    // Create a BSON parser instance
+    var bson = createBSON();
+    // Calculate the size of the document, no function serialization
+    var size = bson.calculateObjectSize(doc);
+    expect(size).to.equal(expectedSize+17);
+    try {
+      bson.serialize(doc);
+    } catch (err) {
+      console.log(err);
+    }
+    done();
+  });
+  /**
+   * @ignore
+   */
   it('Should correctly serialize a given javascript object using a BSON instance with more than 16MB', function(done) {
     var expectedSize = 20*1024*1024;
     // Create a simple object
